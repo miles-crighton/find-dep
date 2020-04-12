@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-const path = require("path");
-const fileHandler = require("./fileHandler.js");
+const search = require("./search");
 
 let argv = require("yargs")
     .usage("$0 <package> [args]")
@@ -14,9 +13,7 @@ let argv = require("yargs")
 if (argv.package) {
     console.log("Searching for package:", argv.package);
 
-    const deps = fileHandler.getDependencies();
-    const packages = fileHandler.getPackageData();
-    console.log("Your local deps: ", deps);
+    search(argv.package);
 } else {
     console.log("Please provide a package string");
 }
