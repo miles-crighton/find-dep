@@ -1,24 +1,39 @@
 const fileHandler = require("./fileHandler");
+var _ = require("lodash");
 
-module.exports = function (target) {
-    const deps = fileHandler.getDependencies();
-    const packages = fileHandler.getPackageData();
+module.exports = function (target, path = "tests/test_set1") {
+    const deps = fileHandler.getDependencies(true, path);
+    const packages = fileHandler.getPackageData(path);
     console.log("Your local deps: ", deps);
 
-    let targetPaths = DFS(target, "yargs", packages);
-    targetPaths.forEach((pathArr) => {
-        console.log(pathArr.join("->"));
+    const depKeys = Object.keys(deps);
+    let targetPaths = [];
+    depKeys.forEach((dependencyName) => {
+        targetPaths = targetPaths.concat(DFS(target, dependencyName, packages));
     });
+
+    if (targetPaths.length > 0) {
+        targetPaths.forEach((pathArr) => {
+            // console.log(pathArr);
+            console.log(pathArr.join("->"));
+        });
+    } else {
+        console.log("Package not found");
+    }
+
     // console.log(targetPaths);
     // Could even run a DFS for each dep on independent threads - overkill
 };
 
 function DFS(target, dep, packages) {
+    // console.log = function () {};
     if (!dep || !target || !packages) {
         throw Error("Missing arguments");
     }
 
-    console.log(`Beginning DFS for target: ${target}`);
+    console.log(`Beginning DFS on ${dep} for target: ${target}`);
+
+    let depBlacklist = {};
 
     //[[TargetPath]] a targetPath can be followed to reach the requested target
     let targetPaths = [];
@@ -34,6 +49,11 @@ function DFS(target, dep, packages) {
     if (dep === target) {
         //If dep is the target return in targetPath format
         return [dep];
+    }
+
+    //A dep without any requires
+    if (!("requires" in packages[dep])) {
+        return [];
     }
 
     //Points to what current path is beind used for searching depdendencies
@@ -61,8 +81,33 @@ function DFS(target, dep, packages) {
         // Search for the resolution to first require in current stack layer
         const currentRequire = requireQueuesStack[stackIndex][0];
 
+        //perform cycle detection
+        if (requireQueuesStack.length > 3) {
+            for (let i = requireQueuesStack.length - 2; i >= 0; i--) {
+                if (requireQueuesStack[i].length > 0) {
+                    if (currentRequire === requireQueuesStack[i][0]) {
+                        depBlacklist[currentRequire] = true;
+                        console.log(
+                            `Cycle detected, blacklisting dep: ${currentRequire}`
+                        );
+                        for (
+                            let j = 0;
+                            j <= requireQueuesStack.length - i;
+                            j++
+                        ) {
+                            requireQueuesStack.pop();
+                            depPathStack.pop();
+                            stackIndex--;
+                        }
+                        requireQueuesStack[stackIndex].shift();
+                        break;
+                    }
+                }
+            }
+        }
+
         //Add a new layer to the stacks for current resolution
-        depPathStack.push(depPathStack[stackIndex]); // Use current path as dep search starting point for next one
+        depPathStack.push(_.cloneDeep(depPathStack[stackIndex])); // Use current path as dep search starting point for next one
         requireQueuesStack.push([]); // Not requires needed for current layer, search first
         stackIndex++;
 
@@ -82,6 +127,9 @@ function DFS(target, dep, packages) {
                 "dependencies" in packageLayerData ||
                 currentDepPath.length === 0
             ) {
+                if ("dependencies" in packageLayerData) {
+                    packageLayerData = packageLayerData.dependencies;
+                }
                 console.log(
                     `Searching through dependency resolvers at current layer`
                 );
@@ -99,8 +147,15 @@ function DFS(target, dep, packages) {
                         let newRequires = Object.keys(
                             packageLayerData[currentRequire].requires
                         );
+                        //Check that newRequires does not include blacklist
+                        newRequires = newRequires.filter((requireName) => {
+                            return !(requireName in depBlacklist);
+                        });
                         requireQueuesStack.pop(); //Remove the empty queue from layer jumping
                         requireQueuesStack.push(newRequires);
+                        //Add resolved require to the dep path
+                        currentDepPath.push(currentRequire);
+
                         break;
                     } else {
                         //Go up a layer, no resolves needed for this require hit
@@ -117,14 +172,11 @@ function DFS(target, dep, packages) {
 
             if (currentDepPath.length === 0) {
                 //No match found for current resolve
-                throw Error("Couldn't resolve a package");
+                throw Error(`Couldn't resolve a package: ${currentRequire}`);
             }
             //Pop off the path array and search one path layer up
             //Replace the currentPath in the depPathStack by removing the last element
-            depPathStack.pop();
             currentDepPath.pop();
-            let newDepPath = currentDepPath;
-            depPathStack.push(newDepPath);
         }
 
         //Check if this layers requires queue is empty.
@@ -181,7 +233,11 @@ function DFS(target, dep, packages) {
         }
         let currentData = packages;
         path.forEach((packageName) => {
-            currentData = currentData[packageName];
+            if ("dependencies" in currentData) {
+                currentData = currentData["dependencies"][packageName];
+            } else {
+                currentData = currentData[packageName];
+            }
         });
         return currentData;
     }
