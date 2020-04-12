@@ -5,7 +5,11 @@ module.exports = function (target) {
     const packages = fileHandler.getPackageData();
     console.log("Your local deps: ", deps);
 
-    DFS(target, "yargs", packages);
+    let targetPaths = DFS(target, "yargs", packages);
+    targetPaths.forEach((pathArr) => {
+        console.log(pathArr.join("->"));
+    });
+    // console.log(targetPaths);
     // Could even run a DFS for each dep on independent threads - overkill
 };
 
@@ -52,7 +56,7 @@ function DFS(target, dep, packages) {
     let requireQueuesStack = [initialRequireQueue];
 
     //Main resolution loop
-    while (requireQueuesStack) {
+    while (requireQueuesStack.length > 0 && depPathStack.length > 0) {
         console.log("New resolution loop iteration");
         // Search for the resolution to first require in current stack layer
         const currentRequire = requireQueuesStack[stackIndex][0];
@@ -84,9 +88,14 @@ function DFS(target, dep, packages) {
                 // Search through the deps looking for currentRequire
                 if (currentRequire in packageLayerData) {
                     console.log(`Require resolution hit on ${currentRequire}`);
+                    if (currentRequire === target) {
+                        console.log(`Target hit!!!`);
+                        buildTargetPath();
+                    }
                     //Check if additional requires are needed
                     if (packageLayerData[currentRequire].requires) {
                         //Add requires to this layer's requireQueue
+                        console.log("Adding new requires to be resolved");
                         let newRequires = Object.keys(
                             packageLayerData[currentRequire].requires
                         );
@@ -120,11 +129,20 @@ function DFS(target, dep, packages) {
 
         //Check if this layers requires queue is empty.
         while (requireQueuesStack[stackIndex].length === 0) {
+            if (stackIndex === 0) {
+                break;
+            }
             //Go up a layer
-            console.log("Empty require resolutions, moving up a layer");
+            console.log(
+                "Empty require resolutions, moving up a layer",
+                requireQueuesStack
+            );
             requireQueuesStack.pop();
             depPathStack.pop();
             stackIndex--;
+            if (requireQueuesStack.length > 0) {
+                requireQueuesStack[stackIndex].shift();
+            }
         }
 
         // Check if the lengths of stacks match with the stackIndex otherwise it's broken
@@ -135,6 +153,10 @@ function DFS(target, dep, packages) {
             throw Error("Stack tracking error.");
         }
 
+        if (stackIndex === 0 && requireQueuesStack[stackIndex].length === 0) {
+            break;
+        }
+
         //@todo if current require is target then follow stacks upward (use a subroutine)
     }
 
@@ -143,10 +165,12 @@ function DFS(target, dep, packages) {
         //Using the first package in the queue as the relevant dependency.
         let targetPath = [];
 
-        for (let i = requireQueuesStack.length - 1; i >= 0; i--) {
+        for (let i = requireQueuesStack.length - 2; i >= 0; i--) {
             //Would there ever be a point where there wouldn't be a 0 index in a requireQueue to access?
             targetPath.unshift(requireQueuesStack[i][0]);
         }
+        //Finally add the dep as the start of the path
+        targetPath.unshift(dep);
 
         targetPaths.push(targetPath);
     }
@@ -161,4 +185,6 @@ function DFS(target, dep, packages) {
         });
         return currentData;
     }
+
+    return targetPaths;
 }
