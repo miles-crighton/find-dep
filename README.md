@@ -1,6 +1,6 @@
 # find-package
 
-Search for packages in your projects dependencies.
+Search for an npm package within your projects dependencies.
 
 Requires package.json and up-to-date package-lock.json
 
@@ -15,3 +15,6 @@ TBA
 ## Todo
 
 -   [ ] Add individual colors to depth of target paths
+-   [ ] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
+-   [ ] Fix hunting for a package in a cycle
+-   [ ] Fix if target is a core dep

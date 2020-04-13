@@ -5,7 +5,29 @@ const chalk = require("chalk");
 const error = chalk.bold.red;
 const success = chalk.bold.green;
 
-module.exports = function (target, path = "tests/test_set1") {
+function interpolateColors(color1, color2, steps) {
+    //[R, G, B]
+    let differences = [];
+    let stepQuantities = [];
+    for (let i = 0; i < 3; i++) {
+        differences.push(color2[i] - color1[i]);
+        stepQuantities.push(Math.round(differences[i] / steps));
+    }
+    let colors = [];
+    for (let i = 0; i < steps; i++) {
+        let color = [];
+        for (let j = 0; j < 3; j++) {
+            let value = color1[j] + stepQuantities[j] * i;
+            value = value > 255 ? 255 : value;
+            value = value < 0 ? 0 : value;
+            color.push(value);
+        }
+        colors.push(color);
+    }
+    return colors;
+}
+
+module.exports = function (target, path = "tests/test_set2") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
     // console.log("Your local deps: ", deps);
@@ -16,11 +38,36 @@ module.exports = function (target, path = "tests/test_set1") {
         targetPaths = targetPaths.concat(DFS(target, dependencyName, packages));
     });
 
+    // Create color gradient based on largest path size
+    let maxPathSize = 0;
+    targetPaths.forEach((val) => {
+        if (val.length > maxPathSize) {
+            maxPathSize = val.length;
+        }
+    });
+
+    const blueGradiant = interpolateColors(
+        [59, 79, 155],
+        [255, 255, 255],
+        maxPathSize
+    );
+
     if (targetPaths.length > 0) {
         console.log(success(`Found ${targetPaths.length} paths for target:`));
         targetPaths.forEach((pathArr) => {
+            let outputString = "";
+            pathArr.map((val, idx) => {
+                outputString += chalk.rgb(
+                    blueGradiant[idx][0],
+                    blueGradiant[idx][1],
+                    blueGradiant[idx][2]
+                )(val);
+                if (idx !== pathArr.length - 1) {
+                    outputString += chalk.white(" → ");
+                }
+            });
             // console.log(pathArr);
-            console.log(pathArr.join(chalk.yellow(" → ")));
+            console.log(outputString);
         });
     } else {
         console.log(error("No package paths found for target"));
