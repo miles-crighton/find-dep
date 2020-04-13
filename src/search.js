@@ -1,10 +1,14 @@
 const fileHandler = require("./fileHandler");
 var _ = require("lodash");
+const chalk = require("chalk");
+
+const error = chalk.bold.red;
+const success = chalk.bold.green;
 
 module.exports = function (target, path = "tests/test_set1") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
-    console.log("Your local deps: ", deps);
+    // console.log("Your local deps: ", deps);
 
     const depKeys = Object.keys(deps);
     let targetPaths = [];
@@ -13,12 +17,13 @@ module.exports = function (target, path = "tests/test_set1") {
     });
 
     if (targetPaths.length > 0) {
+        console.log(success(`Found ${targetPaths.length} paths for target:`));
         targetPaths.forEach((pathArr) => {
             // console.log(pathArr);
-            console.log(pathArr.join("->"));
+            console.log(pathArr.join(chalk.yellow(" → ")));
         });
     } else {
-        console.log("Package not found");
+        console.log(error("No package paths found for target"));
     }
 
     // console.log(targetPaths);
@@ -26,12 +31,13 @@ module.exports = function (target, path = "tests/test_set1") {
 };
 
 function DFS(target, dep, packages) {
+    console.debug = () => {};
     // console.log = function () {};
     if (!dep || !target || !packages) {
         throw Error("Missing arguments");
     }
 
-    console.log(`Beginning DFS on ${dep} for target: ${target}`);
+    console.debug(`Beginning DFS on ${dep} for target: ${target}`);
 
     let depBlacklist = {};
 
@@ -77,7 +83,7 @@ function DFS(target, dep, packages) {
 
     //Main resolution loop
     while (requireQueuesStack.length > 0 && depPathStack.length > 0) {
-        console.log("New resolution loop iteration");
+        console.debug("New resolution loop iteration");
         // Search for the resolution to first require in current stack layer
         const currentRequire = requireQueuesStack[stackIndex][0];
 
@@ -87,7 +93,7 @@ function DFS(target, dep, packages) {
                 if (requireQueuesStack[i].length > 0) {
                     if (currentRequire === requireQueuesStack[i][0]) {
                         depBlacklist[currentRequire] = true;
-                        console.log(
+                        console.debug(
                             `Cycle detected, blacklisting dep: ${currentRequire}`
                         );
                         for (
@@ -115,7 +121,7 @@ function DFS(target, dep, packages) {
         while (true) {
             let currentDepPath = depPathStack[stackIndex];
 
-            console.log("Current dep path: ", currentDepPath);
+            console.debug("Current dep path: ", currentDepPath);
 
             let packageLayerData = getPackageDataFromPath(
                 currentDepPath,
@@ -127,27 +133,32 @@ function DFS(target, dep, packages) {
                 "dependencies" in packageLayerData ||
                 currentDepPath.length === 0
             ) {
+                //Need to get to right point to search in the object
                 if ("dependencies" in packageLayerData) {
                     packageLayerData = packageLayerData.dependencies;
                 }
-                console.log(
+                console.debug(
                     `Searching through dependency resolvers at current layer`
                 );
                 // Search through the deps looking for currentRequire
                 if (currentRequire in packageLayerData) {
-                    console.log(`Require resolution hit on ${currentRequire}`);
+                    console.debug(
+                        `Require resolution hit on ${currentRequire}`
+                    );
                     if (currentRequire === target) {
-                        console.log(`Target hit!!!`);
+                        console.debug(`Target hit!!!`);
                         buildTargetPath();
                     }
                     //Check if additional requires are needed
                     if (packageLayerData[currentRequire].requires) {
                         //Add requires to this layer's requireQueue
-                        console.log("Adding new requires to be resolved");
+                        console.debug("Adding new requires to be resolved");
                         let newRequires = Object.keys(
                             packageLayerData[currentRequire].requires
                         );
                         //Check that newRequires does not include blacklist
+                        // @todo: check if a found black list require is the target,
+                        // then buildtargetPath as a fix current non-full search coverage for packages found in cycles
                         newRequires = newRequires.filter((requireName) => {
                             return !(requireName in depBlacklist);
                         });
@@ -159,7 +170,7 @@ function DFS(target, dep, packages) {
                         break;
                     } else {
                         //Go up a layer, no resolves needed for this require hit
-                        console.log("Searching up a layer.");
+                        console.debug("Searching up a layer.");
                         depPathStack.pop();
                         requireQueuesStack.pop();
                         stackIndex--;
@@ -179,13 +190,13 @@ function DFS(target, dep, packages) {
             currentDepPath.pop();
         }
 
-        //Check if this layers requires queue is empty.
+        //Handles if require Queue is empty and whether next layer only has one require left.
         while (requireQueuesStack[stackIndex].length === 0) {
             if (stackIndex === 0) {
                 break;
             }
             //Go up a layer
-            console.log(
+            console.debug(
                 "Empty require resolutions, moving up a layer",
                 requireQueuesStack
             );
@@ -202,7 +213,7 @@ function DFS(target, dep, packages) {
             requireQueuesStack.length - 1 !== stackIndex ||
             depPathStack.length - 1 !== stackIndex
         ) {
-            throw Error("Stack tracking error.");
+            throw Error(error("Stack tracking error."));
         }
 
         if (stackIndex === 0 && requireQueuesStack[stackIndex].length === 0) {
