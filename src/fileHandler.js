@@ -20,7 +20,6 @@ module.exports.getDependencies = function (dev = false, filePath = "") {
 };
 
 module.exports.getPackageData = function (filePath = "") {
-    //Go create the graph out of the package-lock.json
     let rawPackageData = fs.readFileSync(
         path.join(filePath, "package-lock.json")
     );

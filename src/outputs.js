@@ -37,7 +37,7 @@ module.exports.outputTargetPaths = function (targetPaths, options) {
 
     const blueGradiant = interpolateColors(BLUE, WHITE, maxPathSize);
 
-    console.log(success(`Found ${targetPaths.length} paths for target:`));
+    // console.log(success(`Found ${targetPaths.length} paths for target:`));
     targetPaths.forEach((pathArr, index) => {
         let outputString = chalk.white.bold(`${index + 1}: `);
         pathArr.map((val, idx) => {
