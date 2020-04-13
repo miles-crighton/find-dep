@@ -27,9 +27,10 @@ function interpolateColors(color1, color2, steps) {
     return colors;
 }
 
-module.exports = function (target, path = "tests/test_set1") {
+module.exports = function (target, path = "tests/test_set2") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
+    const options = { verbose: false };
     // console.log("Your local deps: ", deps);
 
     const depKeys = Object.keys(deps);
@@ -57,11 +58,23 @@ module.exports = function (target, path = "tests/test_set1") {
         targetPaths.forEach((pathArr, index) => {
             let outputString = chalk.white(`${index + 1}: `);
             pathArr.map((val, idx) => {
+                let packageName = val;
+                if (!options.verbose) {
+                    const characterLimit = 8;
+                    if (
+                        packageName.length > characterLimit &&
+                        !(idx === 0) &&
+                        !(idx === pathArr.length - 1)
+                    ) {
+                        packageName =
+                            packageName.slice(0, characterLimit) + "...";
+                    }
+                }
                 outputString += chalk.rgb(
                     blueGradiant[idx][0],
                     blueGradiant[idx][1],
                     blueGradiant[idx][2]
-                )(val);
+                )(packageName);
                 if (idx !== pathArr.length - 1) {
                     outputString += chalk.white(" → ");
                 }
