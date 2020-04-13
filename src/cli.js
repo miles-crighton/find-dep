@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 const search = require("./search");
+const outputs = require("./outputs");
+const chalk = require("chalk");
+
+const error = chalk.bold.red;
 
 let argv = require("yargs")
     .usage("$0 <package> [args]")
@@ -11,9 +15,15 @@ let argv = require("yargs")
     }).argv;
 
 if (argv.package) {
-    console.log("Searching for package:", argv.package);
+    const targetPaths = search(argv.package);
 
-    search(argv.package);
+    let options = { verbose: false };
+
+    if (targetPaths.length > 0) {
+        outputs.outputTargetPaths(targetPaths, options);
+    } else {
+        console.log(error("No package paths found for target"));
+    }
 } else {
     console.log("Please provide a package string");
 }

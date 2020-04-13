@@ -14,7 +14,9 @@ TBA
 
 ## Todo
 
--   [ ] Add individual colors to depth of target paths
+-   [x] Add individual colors to depth of target paths
 -   [ ] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
 -   [ ] Fix hunting for a package in a cycle
 -   [ ] Fix if target is a core dep
+-   [ ] Add output as JSON
+-   [ ] Allow wildcards for target matching
