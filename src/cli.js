@@ -12,25 +12,37 @@ let argv = require("yargs")
             describe: "Name of package to find",
             type: "string",
         });
+    })
+    .option("j", {
+        alias: "json",
+        describe: "Output json file",
+        type: "string",
     }).argv;
 
 if (argv.package) {
+    main(argv.package, argv);
+} else {
+    console.log("Please provide a package string");
+}
+
+async function main(package, options) {
     let target = {};
-    if (argv.package.includes("@")) {
-        let [targetName, targetVersion] = argv.package.split("@");
+    if (package.includes("@")) {
+        let [targetName, targetVersion] = package.split("@");
         target = { targetName, targetVersion };
     } else {
-        target = { targetName: argv.package, targetVersion: null };
+        target = { targetName: package, targetVersion: null };
     }
     const targetPaths = search(target);
 
-    let options = { verbose: false };
+    options["verbose"] = false;
 
     if (targetPaths.length > 0) {
-        outputs.outputTargetPaths(targetPaths, options);
+        outputs.outputTargetPaths(targetPaths, options.j);
+        if (options.j) {
+            outputs.outputJSON(targetPaths, options.j);
+        }
     } else {
         console.log(error("No package paths found for target"));
     }
-} else {
-    console.log("Please provide a package string");
 }

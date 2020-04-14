@@ -10,7 +10,7 @@ Requires package.json and up-to-date package-lock.json
 
 ### Arguments
 
-TBA
+-   `-j or --json <path>`: Output the paths found for target into json at the provided path.
 
 ## Todo
 
@@ -18,7 +18,7 @@ TBA
 -   [ ] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
 -   [ ] Fix hunting for a package in a cycle
 -   [ ] Fix if target is a core dep
--   [ ] Add output as JSON
+-   [x] Add output as JSON
 -   [ ] Allow wildcards for target matching
 -   [ ] Add target version searching
 -   [ ] Add version returning

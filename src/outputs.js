@@ -1,4 +1,6 @@
 const chalk = require("chalk");
+const fs = require("fs");
+const path = require("path");
 const success = chalk.bold.green;
 
 function interpolateColors(color1, color2, steps) {
@@ -64,4 +66,23 @@ module.exports.outputTargetPaths = function (targetPaths, options) {
         // console.log(pathArr);
         console.log(outputString);
     });
+};
+
+module.exports.outputJSON = async function (targetPaths, outputPath = "") {
+    let output = {};
+    targetPaths.forEach((path, idx) => {
+        output[idx] = path;
+    });
+    fs.writeFile(
+        path.join(outputPath, "test.json"),
+        JSON.stringify(output, null, 4),
+        "UTF-8",
+        function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("JSON saved to " + outputPath + "/test.json");
+            }
+        }
+    );
 };
