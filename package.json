@@ -1,7 +1,7 @@
 {
     "name": "find-package",
     "version": "1.0.0",
-    "description": "",
+    "description": "Search for a dependency within your package files",
     "main": "src/cli.js",
     "bin": {
         "find-package": "src/cli.js"
@@ -15,7 +15,12 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC"
+    "keywords": [
+        "find",
+        "package",
+        "dependencies",
+        "local"
+    ],
+    "author": "Miles Crighton",
+    "license": "MIT"
 }
