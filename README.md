@@ -30,11 +30,5 @@ Package must include the target name but can also include the version like so: `
 
 ## Todo
 
--   [x] Add individual colors to depth of target paths
--   [x] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
 -   [ ] Fix hunting for a package in a cycle
 -   [ ] Fix if target is a core dep
--   [x] Add output as JSON
--   [x] Allow wildcards for target matching
--   [x] Add target version searching
--   [x] Add version returning
