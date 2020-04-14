@@ -246,23 +246,20 @@ function DFS(target, dep, packages) {
         //Using the first package in the queue as the relevant dependency.
         let targetPath = [];
 
+        //Add the current target to end of first path to search
         let newPathStack = _.cloneDeep(depPathStack);
         newPathStack[newPathStack.length - 1].push(targetName);
 
-        //@todo: use the pathStack to find the versions
-
-        for (let i = requireQueuesStack.length - 2; i >= 0; i--) {
+        for (let i = requireQueuesStack.length - 1; i >= 0; i--) {
             //Would there ever be a point where there wouldn't be a 0 index in a requireQueue to access?
 
-            let version = getPackageDataFromPath(newPathStack[i + 1], packages);
-            console.log("finding version: ", requireQueuesStack[i][0], version);
+            let version = getPackageDataFromPath(newPathStack[i], packages);
+            // Add the main dep if at root of require queue
             targetPath.unshift({
-                name: requireQueuesStack[i][0],
+                name: i === 0 ? dep : requireQueuesStack[i - 1][0],
                 version: version.version,
             });
         }
-        //Finally add the dep as the start of the path
-        targetPath.unshift({ name: dep, version: packages[dep].version });
 
         targetPaths.push(targetPath);
     }
