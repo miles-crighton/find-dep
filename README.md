@@ -16,10 +16,10 @@ Requires package.json and up-to-date package-lock.json
 ## Todo
 
 -   [x] Add individual colors to depth of target paths
--   [ ] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
+-   [x] Add shorten/extended flag to provide ellipsis for in-between deps for a deep path
 -   [ ] Fix hunting for a package in a cycle
 -   [ ] Fix if target is a core dep
 -   [x] Add output as JSON
--   [ ] Allow wildcards for target matching
--   [ ] Add target version searching
--   [ ] Add version returning
+-   [x] Allow wildcards for target matching
+-   [x] Add target version searching
+-   [x] Add version returning
