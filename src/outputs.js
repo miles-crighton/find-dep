@@ -40,8 +40,8 @@ module.exports.outputTargetPaths = function (targetPaths, options) {
     // console.log(success(`Found ${targetPaths.length} paths for target:`));
     targetPaths.forEach((pathArr, index) => {
         let outputString = chalk.white.bold(`${index + 1}: `);
-        pathArr.map((val, idx) => {
-            let packageName = val;
+        pathArr.map(({ name, version }, idx) => {
+            let packageName = name;
             if (!options.verbose) {
                 const characterLimit = 8;
                 if (
@@ -56,7 +56,7 @@ module.exports.outputTargetPaths = function (targetPaths, options) {
                 blueGradiant[idx][0],
                 blueGradiant[idx][1],
                 blueGradiant[idx][2]
-            )(packageName);
+            )(packageName + "@" + version);
             if (idx !== pathArr.length - 1) {
                 outputString += chalk.white.bold(" → ");
             }

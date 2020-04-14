@@ -15,7 +15,9 @@ module.exports = function (target, path = "tests/test_set2") {
     let targetPaths = [];
     depKeys.forEach((dependencyName) => {
         // Could even run a DFS for each dep on independent threads - overkill
-        targetPaths = targetPaths.concat(DFS(target, dependencyName, packages));
+        targetPaths = targetPaths.concat(
+            DFS({ targetName: target }, dependencyName, packages)
+        );
     });
 
     return targetPaths;
@@ -28,7 +30,11 @@ function DFS(target, dep, packages) {
         throw Error("Missing arguments");
     }
 
-    console.debug(`Beginning DFS on ${dep} for target: ${target}`);
+    const { targetName, targetVersion } = target;
+
+    //@todo convert the targetVerion to a regex
+
+    console.debug(`Beginning DFS on ${dep} for target: ${targetName}`);
 
     let depBlacklist = {};
 
@@ -43,7 +49,7 @@ function DFS(target, dep, packages) {
         throw Error(`${dep} not found in package-lock.`);
     }
 
-    if (dep === target) {
+    if (dep === targetName) {
         //If dep is the target return in targetPath format
         return [dep];
     }
@@ -136,9 +142,17 @@ function DFS(target, dep, packages) {
                     console.debug(
                         `Require resolution hit on ${currentRequire}`
                     );
-                    if (currentRequire === target) {
-                        console.debug(`Target hit!!!`);
-                        buildTargetPath();
+                    if (currentRequire === targetName) {
+                        let targetVersion = /\d\.\d\.\d/g;
+                        let foundVersion =
+                            packageLayerData[currentRequire].version;
+                        if (targetVersion) {
+                            if (foundVersion.match(targetVersion)) {
+                                buildTargetPath();
+                            }
+                        } else {
+                            buildTargetPath();
+                        }
                     }
                     //Check if additional requires are needed
                     if (packageLayerData[currentRequire].requires) {
@@ -210,23 +224,6 @@ function DFS(target, dep, packages) {
         if (stackIndex === 0 && requireQueuesStack[stackIndex].length === 0) {
             break;
         }
-
-        //@todo if current require is target then follow stacks upward (use a subroutine)
-    }
-
-    function buildTargetPath() {
-        //Follow requireQueuesStack from last queue to first (last idx -> first idx)
-        //Using the first package in the queue as the relevant dependency.
-        let targetPath = [];
-
-        for (let i = requireQueuesStack.length - 2; i >= 0; i--) {
-            //Would there ever be a point where there wouldn't be a 0 index in a requireQueue to access?
-            targetPath.unshift(requireQueuesStack[i][0]);
-        }
-        //Finally add the dep as the start of the path
-        targetPath.unshift(dep);
-
-        targetPaths.push(targetPath);
     }
 
     function getPackageDataFromPath(path, packages) {
@@ -242,6 +239,32 @@ function DFS(target, dep, packages) {
             }
         });
         return currentData;
+    }
+
+    function buildTargetPath() {
+        //Follow requireQueuesStack from last queue to first (last idx -> first idx)
+        //Using the first package in the queue as the relevant dependency.
+        let targetPath = [];
+
+        let newPathStack = _.cloneDeep(depPathStack);
+        newPathStack[newPathStack.length - 1].push(targetName);
+
+        //@todo: use the pathStack to find the versions
+
+        for (let i = requireQueuesStack.length - 2; i >= 0; i--) {
+            //Would there ever be a point where there wouldn't be a 0 index in a requireQueue to access?
+
+            let version = getPackageDataFromPath(newPathStack[i + 1], packages);
+            console.log("finding version: ", requireQueuesStack[i][0], version);
+            targetPath.unshift({
+                name: requireQueuesStack[i][0],
+                version: version.version,
+            });
+        }
+        //Finally add the dep as the start of the path
+        targetPath.unshift({ name: dep, version: packages[dep].version });
+
+        targetPaths.push(targetPath);
     }
 
     return targetPaths;

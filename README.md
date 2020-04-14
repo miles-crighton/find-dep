@@ -20,3 +20,5 @@ TBA
 -   [ ] Fix if target is a core dep
 -   [ ] Add output as JSON
 -   [ ] Allow wildcards for target matching
+-   [ ] Add target version searching
+-   [ ] Add version returning
