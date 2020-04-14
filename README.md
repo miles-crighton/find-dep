@@ -11,6 +11,7 @@ Requires package.json and up-to-date package-lock.json
 ### Arguments
 
 -   `-j or --json <path>`: Output the paths found for target into json at the provided path.
+-   `-v or --verbose`: Show full package names in output paths
 
 ## Todo
 
