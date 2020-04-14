@@ -23,6 +23,12 @@ let argv = require("yargs")
         describe: "Full package names",
         type: "boolean",
         default: false,
+    })
+    .option("h", {
+        alias: "hide",
+        describe: "Hide versions",
+        type: "boolean",
+        default: false,
     }).argv;
 
 if (argv.package) {

@@ -54,11 +54,14 @@ module.exports.outputTargetPaths = function (targetPaths, options) {
                     packageName = packageName.slice(0, characterLimit) + "...";
                 }
             }
+            const packageString = options.hide
+                ? packageName
+                : packageName + "@" + version;
             outputString += chalk.rgb(
                 blueGradiant[idx][0],
                 blueGradiant[idx][1],
                 blueGradiant[idx][2]
-            )(packageName + "@" + version);
+            )(packageString);
             if (idx !== pathArr.length - 1) {
                 outputString += chalk.white.bold(" → ");
             }
