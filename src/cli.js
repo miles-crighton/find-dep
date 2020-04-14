@@ -17,6 +17,12 @@ let argv = require("yargs")
         alias: "json",
         describe: "Output json file",
         type: "string",
+    })
+    .option("v", {
+        alias: "verbose",
+        describe: "Full package names",
+        type: "boolean",
+        default: false,
     }).argv;
 
 if (argv.package) {
@@ -35,10 +41,8 @@ async function main(package, options) {
     }
     const targetPaths = search(target);
 
-    options["verbose"] = false;
-
     if (targetPaths.length > 0) {
-        outputs.outputTargetPaths(targetPaths, options.j);
+        outputs.outputTargetPaths(targetPaths, options);
         if (options.j) {
             outputs.outputJSON(targetPaths, options.j);
         }
