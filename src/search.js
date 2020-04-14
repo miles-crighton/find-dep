@@ -5,6 +5,41 @@ const chalk = require("chalk");
 const error = chalk.bold.red;
 const success = chalk.bold.green;
 
+function versionToRegex(version) {
+    //Want to allow for wild cards * or ^ & ~ at start
+    let directive = version[0];
+    const parts = version.split(".");
+    if (directive === "~" || directive === "^") {
+        parts[0] = parts[0].slice(1, parts[0].length);
+    }
+    let regexString = "";
+    parts.forEach((val, idx) => {
+        if (directive === "^") {
+            if (idx === 1 || idx === 2) {
+                regexString += "\\d";
+            } else {
+                regexString += val;
+            }
+        } else if (directive === "~") {
+            if (idx === 2) {
+                regexString += "\\d";
+            } else {
+                regexString += val;
+            }
+        } else {
+            if (val === "*") {
+                regexString += "\\d";
+            } else {
+                regexString += val;
+            }
+        }
+
+        regexString += idx === parts.length - 1 ? "" : ".";
+    });
+
+    return RegExp(regexString, "g");
+}
+
 module.exports = function (target, path = "tests/test_set2") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
@@ -15,9 +50,7 @@ module.exports = function (target, path = "tests/test_set2") {
     let targetPaths = [];
     depKeys.forEach((dependencyName) => {
         // Could even run a DFS for each dep on independent threads - overkill
-        targetPaths = targetPaths.concat(
-            DFS({ targetName: target }, dependencyName, packages)
-        );
+        targetPaths = targetPaths.concat(DFS(target, dependencyName, packages));
     });
 
     return targetPaths;
@@ -31,6 +64,10 @@ function DFS(target, dep, packages) {
     }
 
     const { targetName, targetVersion } = target;
+
+    if (targetVersion) {
+        targetVersionRegex = versionToRegex(targetVersion);
+    }
 
     //@todo convert the targetVerion to a regex
 
@@ -143,11 +180,10 @@ function DFS(target, dep, packages) {
                         `Require resolution hit on ${currentRequire}`
                     );
                     if (currentRequire === targetName) {
-                        let targetVersion = /\d\.\d\.\d/g;
                         let foundVersion =
                             packageLayerData[currentRequire].version;
                         if (targetVersion) {
-                            if (foundVersion.match(targetVersion)) {
+                            if (foundVersion.match(targetVersionRegex)) {
                                 buildTargetPath();
                             }
                         } else {

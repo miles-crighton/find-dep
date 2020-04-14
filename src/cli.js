@@ -15,7 +15,14 @@ let argv = require("yargs")
     }).argv;
 
 if (argv.package) {
-    const targetPaths = search(argv.package);
+    let target = {};
+    if (argv.package.includes("@")) {
+        let [targetName, targetVersion] = argv.package.split("@");
+        target = { targetName, targetVersion };
+    } else {
+        target = { targetName: argv.package, targetVersion: null };
+    }
+    const targetPaths = search(target);
 
     let options = { verbose: false };
 
