@@ -14,24 +14,14 @@ function versionToRegex(version) {
     }
     let regexString = "";
     parts.forEach((val, idx) => {
-        if (directive === "^") {
-            if (idx === 1 || idx === 2) {
-                regexString += "\\d";
-            } else {
-                regexString += val;
-            }
-        } else if (directive === "~") {
-            if (idx === 2) {
-                regexString += "\\d";
-            } else {
-                regexString += val;
-            }
+        if (directive === "^" && (idx === 1 || idx === 2)) {
+            regexString += "\\d";
+        } else if (directive === "~" && idx === 2) {
+            regexString += "\\d";
+        } else if (val === "*") {
+            regexString += "\\d";
         } else {
-            if (val === "*") {
-                regexString += "\\d";
-            } else {
-                regexString += val;
-            }
+            regexString += val;
         }
 
         regexString += idx === parts.length - 1 ? "" : ".";
@@ -43,8 +33,6 @@ function versionToRegex(version) {
 module.exports = function (target, path = "tests/test_set2") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
-    const options = { verbose: false };
-    // console.log("Your local deps: ", deps);
 
     const depKeys = Object.keys(deps);
     let targetPaths = [];
