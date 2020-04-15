@@ -1,14 +1,17 @@
 # find-package
 
-Search for an npm package within your projects dependencies.
+Search and list paths to a specific package dependency within your npm-based project.
 
-Requires package.json and up-to-date package-lock.json
+Requires package.json and up-to-date package-lock.json.
 
 ## Usage
 
 `find-package <package-name@version>`
 
 Package must include the target name but can also include the version like so: `example@1.0.0`
+
+The program will grab data from the package files within the execution directory,
+to search beyond this use the `--path <path>` option.
 
 #### Version options
 
@@ -24,9 +27,10 @@ Package must include the target name but can also include the version like so: `
 
 ### Arguments
 
--   `-j or --json <path>`: Output the paths found for target into json at the provided path.
+-   `-j or --json <path>`: Output the paths found for target into json at the provided path
 -   `-v or --verbose`: Show full package names in output paths
 -   `-h or --hide`: Hide the version numbers in the output paths
+-   `-p or --path`: Specify a path to package.json and package-lock.json outside of current directory
 
 ## Todo
 
