@@ -3,7 +3,7 @@
 Search and list paths to a specific package dependency within your npm-based project.
 
 ```sh
-find-package example@1.0.0
+find-dep example@1.0.0
 1: core-dep1@3.0.0 → example@1.0.0
 2: core-dep2@2.0.0 → inner-dep@3.0.0 → example@1.0.0
 ```
@@ -25,7 +25,7 @@ npm i -g find-dep
 ## Usage
 
 ```sh
-find-package <package-name@version>
+find-dep <package-name@version>
 ```
 
 Package must include the target name but can also include the version like so: `example@1.0.0`
@@ -40,10 +40,6 @@ to search beyond this use the `--path <path>` option.
 -   A `^` can be used to specify any patch version (`ie 1.0.X`).
 
 -   A `~` can be used to specify any minor/patch version (`ie 1.X.X`).
-
-#### Example
-
-`find-package ms@2.0.0`
 
 ### Arguments
 

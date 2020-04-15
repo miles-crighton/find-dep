@@ -1,6 +1,6 @@
 {
     "name": "find-dep",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Search for a package's dependency paths within your project",
     "main": "src/cli.js",
     "bin": {
