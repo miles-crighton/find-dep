@@ -2,8 +2,6 @@
 
 Search and list paths to a specific package dependency within your npm-based project.
 
-`find-package p-try`
-
 Requires package.json and up-to-date package-lock.json.
 
 ## Usage
