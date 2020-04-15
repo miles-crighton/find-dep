@@ -1,7 +1,7 @@
 {
     "name": "find-dep",
     "version": "1.0.0",
-    "description": "Search for a dependency path within your package files",
+    "description": "Search for a package's dependency paths within your project",
     "main": "src/cli.js",
     "bin": {
         "find-dep": "src/cli.js"
@@ -25,6 +25,7 @@
         "dependencies",
         "local"
     ],
+    "homepage": "https://github.com/miles-crighton/find-dep",
     "author": "Miles Crighton",
     "license": "MIT"
 }

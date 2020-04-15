@@ -2,19 +2,35 @@
 
 Search and list paths to a specific package dependency within your npm-based project.
 
-Requires package.json and up-to-date package-lock.json.
+```sh
+find-package example@1.0.0
+1: core-dep1@3.0.0 → example@1.0.0
+2: core-dep2@2.0.0 → inner-dep@3.0.0 → example@1.0.0
+```
+
+## Installation
+
+Try once:
+
+```sh
+npx find-dep <package>
+```
+
+Or install globally:
+
+```sh
+npm i -g find-dep
+```
 
 ## Usage
 
 ```sh
 find-package <package-name@version>
-1: core-dep1@3.0.0 → example@1.0.0
-2: core-dep2@2.0.0 → inner-dep@3.0.0 → example@1.0.0
 ```
 
 Package must include the target name but can also include the version like so: `example@1.0.0`
 
-The program will grab data from the package files within the execution directory,
+The program will grab data from the package files (`package.json/package-lock.json`) within the execution directory,
 to search beyond this use the `--path <path>` option.
 
 #### Version options
