@@ -2,11 +2,17 @@
 
 Search and list paths to a specific package dependency within your npm-based project.
 
+`find-package p-try`
+
 Requires package.json and up-to-date package-lock.json.
 
 ## Usage
 
-`find-package <package-name@version>`
+```sh
+find-package <package-name@version>
+1: core-dep1@3.0.0 → example@1.0.0
+2: core-dep2@2.0.0 → inner-dep@3.0.0 → example@1.0.0
+```
 
 Package must include the target name but can also include the version like so: `example@1.0.0`
 
