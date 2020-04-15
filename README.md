@@ -32,6 +32,10 @@ to search beyond this use the `--path <path>` option.
 -   `-h or --hide`: Hide the version numbers in the output paths
 -   `-p or --path`: Specify a path to package.json and package-lock.json outside of current directory
 
+## License
+
+Licensed under the MIT License.
+
 ## Todo
 
 -   [ ] Fix hunting for a package in a cycle
