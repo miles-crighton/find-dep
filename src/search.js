@@ -30,7 +30,7 @@ function versionToRegex(version) {
     return RegExp(regexString, "g");
 }
 
-module.exports = function (target, path = "tests/test_set2") {
+module.exports = function (target, path = "") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
 

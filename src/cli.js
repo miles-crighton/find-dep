@@ -29,6 +29,12 @@ let argv = require("yargs")
         describe: "Hide versions",
         type: "boolean",
         default: false,
+    })
+    .option("p", {
+        alias: "path",
+        describe: "Path of package.json & package-lock.json",
+        type: "string",
+        default: "",
     }).argv;
 
 if (argv.package) {
@@ -45,7 +51,7 @@ async function main(package, options) {
     } else {
         target = { targetName: package, targetVersion: null };
     }
-    const targetPaths = search(target);
+    const targetPaths = search(target, options.path);
 
     if (targetPaths.length > 0) {
         outputs.outputTargetPaths(targetPaths, options);
