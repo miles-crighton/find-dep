@@ -1,7 +1,7 @@
 {
-    "name": "find-package",
+    "name": "find-dep",
     "version": "1.0.0",
-    "description": "Search for a dependency within your package files",
+    "description": "Search for a dependency path within your package files",
     "main": "src/cli.js",
     "bin": {
         "find-package": "src/cli.js"

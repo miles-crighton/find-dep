@@ -1,4 +1,4 @@
-# find-package
+# find-dep
 
 Search and list paths to a specific package dependency within your npm-based project.
 
