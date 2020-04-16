@@ -48,7 +48,8 @@ function DFS(target, dep, packages) {
     console.debug = () => {};
     // console.log = function () {};
     if (!dep || !target || !packages) {
-        throw Error("Missing arguments");
+        console.warn("DFS(): missing arguments");
+        return [];
     }
 
     const { targetName, targetVersion } = target;
