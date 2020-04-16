@@ -37,9 +37,9 @@ to search beyond this use the `--path <path>` option.
 
 -   The wildcard `*` can be used in versions to signify any numeric value (`ie 1.*.0`).
 
--   A `^` can be used to specify any patch version (`ie 1.0.X`).
+-   A `^` can be used to specify any patch version (`ie ^1.0.X`).
 
--   A `~` can be used to specify any minor/patch version (`ie 1.X.X`).
+-   A `~` can be used to specify any minor/patch version (`ie ~1.X.X`).
 
 ### Arguments
 
