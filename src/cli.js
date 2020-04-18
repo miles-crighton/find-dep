@@ -51,7 +51,7 @@ async function main(package, options) {
     } else {
         target = { targetName: package, targetVersion: null };
     }
-    const targetPaths = search(target, options.path);
+    const targetPaths = search.for(target, options.path);
 
     if (targetPaths.length > 0) {
         outputs.outputTargetPaths(targetPaths, options);
