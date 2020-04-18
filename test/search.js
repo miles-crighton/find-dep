@@ -4,6 +4,8 @@ const path = require("path");
 
 const TEST_SETS = [];
 TEST_SETS.push(path.join(__dirname, "test_sets/test_set1"));
+TEST_SETS.push(path.join(__dirname, "test_sets/test_set2"));
+TEST_SETS.push(path.join(__dirname, "test_sets/test_set3"));
 
 describe("#search.DFS()", function () {
     context("without arguments", function () {
@@ -50,14 +52,59 @@ describe("#search.for()", function () {
             expect(search.for()).to.eql([]);
         });
     });
-    context("core dependency as target", function () {
-        it("#TEST_SET1: should return that core dep as path", function () {
+    context("core dependency as target #TEST_SET1", function () {
+        it("should return that core dep as path", function () {
             expect(search.for({ targetName: "ms" }, TEST_SETS[0])).to.eql([
                 [
                     {
                         name: "ms",
                         version: "2.1.2",
                     },
+                ],
+            ]);
+        });
+    });
+    context("#TEST_SET3 returning expected target paths", function () {
+        it("should return target paths for 'locate-path'", function () {
+            expect(
+                search.for({ targetName: "locate-path" }, TEST_SETS[2])
+            ).to.eql([
+                [
+                    { name: "yargs", version: "15.3.1" },
+                    { name: "find-up", version: "4.1.0" },
+                    { name: "locate-path", version: "5.0.0" },
+                ],
+                [
+                    { name: "mocha", version: "7.1.1" },
+                    { name: "find-up", version: "3.0.0" },
+                    { name: "locate-path", version: "3.0.0" },
+                ],
+                [
+                    { name: "mocha", version: "7.1.1" },
+                    { name: "yargs", version: "13.3.2" },
+                    { name: "find-up", version: "3.0.0" },
+                    { name: "locate-path", version: "3.0.0" },
+                ],
+                [
+                    { name: "mocha", version: "7.1.1" },
+                    { name: "yargs-unparser", version: "1.6.0" },
+                    { name: "yargs", version: "13.3.2" },
+                    { name: "find-up", version: "3.0.0" },
+                    { name: "locate-path", version: "3.0.0" },
+                ],
+            ]);
+        });
+        it("should return target paths for 'locate-path@5.0.0'", function () {
+            expect(
+                search.for(
+                    { targetName: "locate-path", targetVersion: "5.0.0" },
+                    TEST_SETS[2]
+                )
+            ).to.eql([
+                [
+                    { name: "yargs", version: "15.3.1" },
+                    { name: "find-up", version: "4.1.0" },
+                    { name: "locate-path", version: "5.0.0" },
                 ],
             ]);
         });
