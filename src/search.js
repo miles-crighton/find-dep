@@ -5,7 +5,7 @@ const chalk = require("chalk");
 const error = chalk.bold.red;
 const success = chalk.bold.green;
 
-function versionToRegex(version) {
+module.exports.versionToRegex = function (version) {
     //Want to allow for wild cards * or ^ & ~ at start
     let directive = version[0];
     const parts = version.split(".");
@@ -28,9 +28,9 @@ function versionToRegex(version) {
     });
 
     return RegExp(regexString, "g");
-}
+};
 
-module.exports = function (target, path = "") {
+module.exports.for = function (target, path = "") {
     const deps = fileHandler.getDependencies(true, path);
     const packages = fileHandler.getPackageData(path);
 
@@ -38,27 +38,27 @@ module.exports = function (target, path = "") {
     let targetPaths = [];
     depKeys.forEach((dependencyName) => {
         // Could even run a DFS for each dep on independent threads - overkill
-        targetPaths = targetPaths.concat(DFS(target, dependencyName, packages));
+        targetPaths = targetPaths.concat(
+            this.DFS(target, dependencyName, packages)
+        );
     });
 
     return targetPaths;
 };
 
-function DFS(target, dep, packages) {
+module.exports.DFS = function (target, dep, packages) {
     console.debug = () => {};
-    // console.log = function () {};
+
     if (!dep || !target || !packages) {
-        console.warn("DFS(): missing arguments");
+        // console.warn("DFS(): missing arguments");
         return [];
     }
 
     const { targetName, targetVersion } = target;
 
     if (targetVersion) {
-        targetVersionRegex = versionToRegex(targetVersion);
+        targetVersionRegex = this.versionToRegex(targetVersion);
     }
-
-    //@todo convert the targetVerion to a regex
 
     console.debug(`Beginning DFS on ${dep} for target: ${targetName}`);
 
@@ -77,7 +77,7 @@ function DFS(target, dep, packages) {
 
     if (dep === targetName) {
         //If dep is the target return in targetPath format
-        return [dep];
+        return [[{ name: dep, version: packages[dep].version }]];
     }
 
     //A dep without any requires
@@ -290,4 +290,4 @@ function DFS(target, dep, packages) {
     }
 
     return targetPaths;
-}
+};
