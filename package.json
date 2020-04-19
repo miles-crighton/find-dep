@@ -13,10 +13,12 @@
     },
     "devDependencies": {
         "chai": "^4.2.0",
+        "husky": "^4.2.5",
         "mocha": "^7.1.1"
     },
     "scripts": {
-        "test": "npx mocha"
+        "test": "npx mocha",
+        "publish": "npm publish"
     },
     "keywords": [
         "find",
@@ -29,6 +31,12 @@
         "local"
     ],
     "homepage": "https://github.com/miles-crighton/find-dep",
+    "repository": "https://github.com/miles-crighton/find-dep",
     "author": "Miles Crighton",
-    "license": "MIT"
+    "license": "MIT",
+    "husky": {
+        "hooks": {
+            "pre-commit": "npm test"
+        }
+    }
 }
